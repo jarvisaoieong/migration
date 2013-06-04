@@ -4,9 +4,13 @@
  * Module dependencies.
  */
 
+require('coffee-script');
+
 var migrate = require('../')
   , join = require('path').join
-  , fs = require('fs');
+  , fs = require('fs')
+  , moment = require('moment');
+
 
 /**
  * Arguments.
@@ -62,6 +66,16 @@ var template = [
   , ''
 ].join('\n');
 
+var coffeeTemplate = [
+    ''
+  , 'exports.up = (next) ->'
+  , '  next()'
+  , ''
+  , 'exports.down = (next) ->'
+  , '  next()'
+  , ''
+].join('\n');
+
 // require an argument
 
 function required() {
@@ -107,7 +121,7 @@ while (args.length) {
 
 function migrations() {
   return fs.readdirSync('migrations').filter(function(file){
-    return file.match(/^\d+.*\.js$/);
+    return file.match(/^\d+.*\.(js|coffee)$/);
   }).sort().map(function(file){
     return 'migrations/' + file;
   });
@@ -162,31 +176,12 @@ var commands = {
    */
 
   create: function(){
-    var migrations = fs.readdirSync('migrations').filter(function(file){
-      return file.match(/^\d+/);
-    }).map(function(file){
-      return parseInt(file.match(/^(\d+)/)[1], 10);
-    }).sort(function(a, b){
-      return a - b;
-    });
-
-    var curr = pad((migrations.pop() || 0) + 1)
+    var curr = moment().format('YYYYMMDDHHmmssSSS')
       , title = slugify([].slice.call(arguments).join(' '));
     title = title ? curr + '-' + title : curr; 
-    create(title);
+    createCoffee(title);
   }
 };
-
-/**
- * Pad the given number.
- *
- * @param {Number} n
- * @return {String}
- */
-
-function pad(n) {
-  return Array(4 - n.toString().length).join('0') + n;
-}
 
 /**
  * Create a migration with the given `name`.
@@ -198,6 +193,12 @@ function create(name) {
   var path = 'migrations/' + name + '.js';
   log('create', join(cwd, path));
   fs.writeFileSync(path, template);
+}
+
+function createCoffee(name) {
+  var path = 'migrations/' + name + '.coffee';
+  log('create', join(cwd, path));
+  fs.writeFileSync(path, coffeeTemplate);
 }
 
 /**
