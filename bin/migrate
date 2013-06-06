@@ -11,6 +11,11 @@ var migrate = require('../')
   , fs = require('fs')
   , moment = require('moment');
 
+/**
+ * Enviorment.
+ */
+
+process.env.NODE_ENV || (process.env.NODE_ENV = 'development');
 
 /**
  * Arguments.
@@ -105,6 +110,10 @@ while (args.length) {
     case '-c':
     case '--chdir':
       process.chdir(cwd = required());
+      break;
+    case '-e':
+    case '--env':
+      process.env.NODE_ENV = args.shift();
       break;
     default:
       if (options.command) {
@@ -208,7 +217,7 @@ function createCoffee(name) {
  */
 
 function performMigration(direction, migrationName) {
-  migrate('migrations/.migrate');
+  migrate('migrations/.migrate-' + process.env.NODE_ENV);
   migrations().forEach(function(path){
     var mod = require(process.cwd() + '/' + path);
     migrate(path, mod.up, mod.down);
