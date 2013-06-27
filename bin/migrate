@@ -18,10 +18,27 @@ var migrate = require('../')
 process.env.NODE_ENV || (process.env.NODE_ENV = 'development');
 
 /**
+ * migrate.opts support
+ */
+
+try {
+  var opts = fs.readFileSync('migrations/migrate.opts', 'utf8')
+    .trim()
+    .split(/\s+/);
+
+  process.argv = process.argv
+    .slice(0, 2)
+    .concat(opts.concat(process.argv.slice(2)));
+} catch (err) {
+  // ignore
+}
+
+/**
  * Arguments.
  */
 
 var args = process.argv.slice(2);
+
 
 /**
  * Option defaults.
@@ -46,8 +63,9 @@ var usage = [
   , '  Options:'
   , ''
   , '     -c, --chdir <path>   change the working directory'
-  , '     --js, create js migration template'
-  , '     --coffee, create coffee-script migration template'
+  , '     --js                 create js migration template'
+  , '     --coffee             create coffee-script migration template'
+  , '     -e, --env            set NODE_ENV, default is development'
   , ''
   , '  Commands:'
   , ''
