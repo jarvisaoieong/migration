@@ -46,6 +46,8 @@ var usage = [
   , '  Options:'
   , ''
   , '     -c, --chdir <path>   change the working directory'
+  , '     --js, create js migration template'
+  , '     --coffee, create coffee-script migration template'
   , ''
   , '  Commands:'
   , ''
@@ -59,7 +61,9 @@ var usage = [
  * Migration template.
  */
 
-var template = [
+var fileFormat = 'js';
+
+var jsTemplate = [
     ''
   , 'exports.up = function(next){'
   , '  next();'
@@ -114,6 +118,12 @@ while (args.length) {
     case '-e':
     case '--env':
       process.env.NODE_ENV = args.shift();
+      break;
+    case '--js':
+      fileFormat = 'js';
+      break;
+    case '--coffee':
+      fileFormat = 'coffee';
       break;
     default:
       if (options.command) {
@@ -188,7 +198,14 @@ var commands = {
     var curr = moment().format('YYYYMMDDHHmmssSSS')
       , title = slugify([].slice.call(arguments).join(' '));
     title = title ? curr + '-' + title : curr; 
-    createCoffee(title);
+    switch (fileFormat) {
+      case 'js':
+        createJs(title);
+        break;
+      case 'coffee':
+        createCoffee(title);
+        break;
+    }
   }
 };
 
@@ -198,10 +215,10 @@ var commands = {
  * @param {String} name
  */
 
-function create(name) {
+function createJs(name) {
   var path = 'migrations/' + name + '.js';
   log('create', join(cwd, path));
-  fs.writeFileSync(path, template);
+  fs.writeFileSync(path, jsTemplate);
 }
 
 function createCoffee(name) {
