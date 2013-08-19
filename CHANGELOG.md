@@ -1,3 +1,11 @@
+0.2.0 / 2013-08-19
+
+  migration based on [node-migrate](https://github.com/visionmedia/node-migrate)
+
+  * coffee script support
+  * env flag
+  * migrate.opts default flag setting
+  * timestamp instead of sequnece number in file name when create migrate file
 
 0.1.3 / 2012-06-25 
 ==================
