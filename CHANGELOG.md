@@ -1,4 +1,10 @@
+0.2.1 /2013-10-03
+=================
+
+  - 0.10.x support, add cwd default '' value
+
 0.2.0 / 2013-08-19
+==================
 
   migration based on [node-migrate](https://github.com/visionmedia/node-migrate)
 

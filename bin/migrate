@@ -50,7 +50,7 @@ var options = { args: [] };
  * Current working directory.
  */
 
-var cwd;
+var cwd = '';
 
 /**
  * Usage information.
@@ -215,7 +215,7 @@ var commands = {
   create: function(){
     var curr = moment().format('YYYYMMDDHHmmssSSS')
       , title = slugify([].slice.call(arguments).join(' '));
-    title = title ? curr + '-' + title : curr; 
+    title = title ? curr + '-' + title : curr;
     switch (fileFormat) {
       case 'js':
         createJs(title);
@@ -272,7 +272,7 @@ function performMigration(direction, migrationName) {
   var migrationPath = migrationName
     ? join('migrations', migrationName)
     : migrationName;
- 
+
   set[direction](null, migrationPath);
 }
 
