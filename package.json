@@ -1,6 +1,6 @@
 {
   "name": "migration",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Abstract migration framework for node",
   "keywords": [
     "migrate",
@@ -10,24 +10,26 @@
   "author": {
     "name": "Jarvis Ao Ieong",
     "email": "kinua1230@gmail.com",
-    "url": "https://github.com/kinua"
+    "url": "https://github.com/jarvisaoieong"
   },
   "bin": {
     "migrate": "./bin/migrate"
   },
   "main": "lib/migrate",
-  "homepage": "https://github.com/kinua/migration",
-  "bugs": "https://github.com/kinua/migration/issues",
+  "homepage": "https://github.com/jarvisaoieong/migration",
+  "bugs": "https://github.com/jarvisaoieong/migration/issues",
   "repository": {
     "type": "git",
-    "url": "git://github.com/kinua/migration.git"
+    "url": "git://github.com/jarvisaoieong/migration.git"
   },
   "engines": {
     "node": ">=0.8.0",
     "npm": ">=1.2.10"
   },
   "dependencies": {
-    "coffee-script": "~1.6.3",
     "moment": "~2.0.0"
+  },
+  "devDependencies": {
+    "coffee-script": "~1.7.1"
   }
 }

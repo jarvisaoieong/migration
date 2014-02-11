@@ -4,8 +4,6 @@
  * Module dependencies.
  */
 
-require('coffee-script');
-
 var migrate = require('../')
   , join = require('path').join
   , fs = require('fs')
@@ -53,6 +51,12 @@ var options = { args: [] };
 var cwd = '';
 
 /**
+ * Default extension
+ */
+
+var extension = 'js'
+
+/**
  * Usage information.
  */
 
@@ -62,44 +66,15 @@ var usage = [
   , ''
   , '  Options:'
   , ''
-  , '     -c, --chdir <path>   change the working directory'
-  , '     --js                 create js migration template'
-  , '     --coffee             create coffee-script migration template'
-  , '     -e, --env            set NODE_ENV, default is development'
+  , '     -c, --chdir <path>           change the working directory'
+  , '     -e, --env                    set NODE_ENV, default is development'
+  , '     --compiler <ext>:<module>    use the given module to create or compile files'
   , ''
   , '  Commands:'
   , ''
   , '     down   [name]    migrate down till given migration'
   , '     up     [name]    migrate up till given migration (the default command)'
   , '     create [title]   create a new migration file with optional [title]'
-  , ''
-].join('\n');
-
-/**
- * Migration template.
- */
-
-var fileFormat = 'js';
-
-var jsTemplate = [
-    ''
-  , 'exports.up = function(next){'
-  , '  next();'
-  , '};'
-  , ''
-  , 'exports.down = function(next){'
-  , '  next();'
-  , '};'
-  , ''
-].join('\n');
-
-var coffeeTemplate = [
-    ''
-  , 'exports.up = (next) ->'
-  , '  next()'
-  , ''
-  , 'exports.down = (next) ->'
-  , '  next()'
   , ''
 ].join('\n');
 
@@ -115,6 +90,19 @@ function required() {
 function abort(msg) {
   console.error('  %s', msg);
   process.exit(1);
+}
+
+// custom compiler support
+
+var registerCompiler = function (c) {
+  var compiler = c.split(':')
+    , ext = compiler[0]
+    , mod = compiler[1];
+
+  extension = ext;
+
+  if (mod[0] == '.') mod = join(process.cwd(), mod);
+  require(mod);
 }
 
 // parse arguments
@@ -135,14 +123,11 @@ while (args.length) {
       break;
     case '-e':
     case '--env':
-      process.env.NODE_ENV = args.shift();
+      process.env.NODE_ENV = required();
       break;
-    case '--js':
-      fileFormat = 'js';
-      break;
-    case '--coffee':
-      fileFormat = 'coffee';
-      break;
+    case '--compiler':
+      registerCompiler(required());
+      break
     default:
       if (options.command) {
         options.args.push(arg);
@@ -158,7 +143,7 @@ while (args.length) {
 
 function migrations() {
   return fs.readdirSync('migrations').filter(function(file){
-    return file.match(/^\d+.*\.(js|coffee)$/);
+    return file.match(/^\d+/);
   }).sort().map(function(file){
     return 'migrations/' + file;
   });
@@ -216,34 +201,11 @@ var commands = {
     var curr = moment().format('YYYYMMDDHHmmssSSS')
       , title = slugify([].slice.call(arguments).join(' '));
     title = title ? curr + '-' + title : curr;
-    switch (fileFormat) {
-      case 'js':
-        createJs(title);
-        break;
-      case 'coffee':
-        createCoffee(title);
-        break;
-    }
+    var path = 'migrations/' + title + '.' + extension;
+    log('create', join(cwd, path));
+    fs.writeFileSync(path, '');
   }
 };
-
-/**
- * Create a migration with the given `name`.
- *
- * @param {String} name
- */
-
-function createJs(name) {
-  var path = 'migrations/' + name + '.js';
-  log('create', join(cwd, path));
-  fs.writeFileSync(path, jsTemplate);
-}
-
-function createCoffee(name) {
-  var path = 'migrations/' + name + '.coffee';
-  log('create', join(cwd, path));
-  fs.writeFileSync(path, coffeeTemplate);
-}
 
 /**
  * Perform a migration in the given `direction`.
@@ -255,6 +217,8 @@ function performMigration(direction, migrationName) {
   migrate('migrations/.migrate-' + process.env.NODE_ENV);
   migrations().forEach(function(path){
     var mod = require(process.cwd() + '/' + path);
+    mod.up || (mod.up = function(next) {next();});
+    mod.down || (mod.down = function(next) {next();});
     migrate(path, mod.up, mod.down);
   });
 

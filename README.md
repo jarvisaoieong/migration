@@ -1,6 +1,6 @@
 # migration
 
-  Abstract migration framework for node, support javascript and coffee-script.
+  Abstract migration framework for node, support javascript and any js preprocessor
 
 ## Origin
 
@@ -8,10 +8,10 @@ This project is based on TJ's [node-migrate](https://github.com/visionmedia/node
 
 The main difference:
 
-- coffee script support
+- js preprocessor support (using `--compiler <ext>:<module>` flag)
 - env flag
 - migrate.opts default flag setting
-- timestamp instead of sequnece number in file name when create migrate file
+- timestamp instead of sequnece number in file name when creating migrate file
 
 ## Installation
 
@@ -23,10 +23,9 @@ The main difference:
 
     Options:
 
-       -c, --chdir <path>   change the working directory
-       --js                 create js migration template
-       --coffee             create coffee-script migration template
-       -e, --env            set NODE_ENV, default is development
+       -c, --chdir <path>           change the working directory
+       -e, --env                    set NODE_ENV, default is development
+       --compiler <ext>:<module>    use the given module to create or compile files
 
     Commands:
 
